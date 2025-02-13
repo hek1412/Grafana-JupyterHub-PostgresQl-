@@ -57,37 +57,7 @@ services:
       - postgrestest
     networks:
       - jupyterhubtest  
-  # sql_exporter:
-  #   image: burningalchemist/sql_exporter:0.17 #0.5
-  #   ports:
-  #     - "35010:9399"  # Порт, на котором работает sql_exporter
-  #   volumes:
-  #     - ./sql_exporter.yml:/etc/sql_exporter/sql_exporter.yml
-  #   command:
-  #     - '--config.file=/etc/sql_exporter/sql_exporter.yml'
-  #   depends_on:
-  #     - postgrestest
-  #   networks:
-  #     - jupyterhubtest
-
-  # postgres_exporter:
-  #   image: prometheuscommunity/postgres-exporter:latest #v0.16.0
-  #   container_name: postgres_exportertest
-  #   environment:
-  #     DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgrestest:5432/postgres_db?sslmode=disable"
-  #   volumes:
-  #     - ./postgres_exporter.yml:/etc/postgres_exporter/postgres_exporter.yml    
-  #     - ./queries.yaml:/etc/postgres_exporter/queries.yaml    
-  #   command:
-  #     - '--config.file=/etc/postgres_exporter/postgres_exporter.yml'    
-  #     # - "--extend.query-path=/etc/postgres_exporter/queries.yaml"    
-  #   ports:
-  #     - "35004:9187"
-  #   depends_on:
-  #     - postgrestest
-  #   networks:
-  #     - jupyterhubtest
-
+ 
   prometheus:
     image: prom/prometheus:latest #v3.1.0
     container_name: prometheustest
@@ -97,7 +67,6 @@ services:
       - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
-      # - '--storage.tsdb.path=/prometheus'
     ports:
       - "35005:9090"
     networks:
@@ -135,20 +104,13 @@ services:
     container_name: node-exportertest
     ports:
       - "35009:9100"
-       # pid: "host"
     networks:
       - jupyterhubtest
     volumes:
-      # - /proc:/host/proc:ro
-      # - /sys:/host/sys:ro
       # -  ./metrics:/app/metrics:rw
       - /var/lib/node_exporter:/app/metrics:ro
-      # - /:/host:ro
     command:
-      # - '--path.procfs=/host/proc'
-      # - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-      # - '--collector.textfile.directory=/var/lib/node_exporter'
       - '--collector.textfile.directory=/app/metrics'
 
   alertmanager:
