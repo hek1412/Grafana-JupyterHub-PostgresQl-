@@ -1,0 +1,180 @@
+services:
+
+  jupyterhubtest:
+    build:
+      context: .
+      dockerfile: Dockerfile.jupyterhub
+    restart: always
+    image: jupyterhub
+    container_name: jupyterhubtest
+    networks:
+      - jupyterhubtest
+    volumes:
+      - "./jupyterhub_config.py:/srv/jupyterhubtest/jupyterhub_config.py"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "jupyterhub-datatest:/srv/jupyterhubtest/data"
+    ports:
+      - "35003:8000"
+    environment:
+      - JUPYTERHUB_BASE_URL=/hub
+      - JUPYTERHUB_URL=http://skayfaks.keenetic.pro:35003
+ 
+  postgrestest:
+    image: postgres:17.2-bookworm
+    container_name: postgrestest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres_db
+      PGDATA: /var/lib/postgresql/data/
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-datatest:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d postgres_db" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - jupyterhubtest
+
+  pg_metrics_exporter:
+    build:
+      context: .
+      dockerfile: Dockerfile.exporter
+    container_name: pg_metrics_exportertest
+    volumes:
+      - ./metrics:/metrics  # Монтируем директорию для метрик
+    environment:
+      POSTGRES_HOST: postgrestest
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: postgres_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    depends_on:
+      - postgrestest
+    networks:
+      - jupyterhubtest  
+  # sql_exporter:
+  #   image: burningalchemist/sql_exporter:0.17 #0.5
+  #   ports:
+  #     - "35010:9399"  # Порт, на котором работает sql_exporter
+  #   volumes:
+  #     - ./sql_exporter.yml:/etc/sql_exporter/sql_exporter.yml
+  #   command:
+  #     - '--config.file=/etc/sql_exporter/sql_exporter.yml'
+  #   depends_on:
+  #     - postgrestest
+  #   networks:
+  #     - jupyterhubtest
+
+  # postgres_exporter:
+  #   image: prometheuscommunity/postgres-exporter:latest #v0.16.0
+  #   container_name: postgres_exportertest
+  #   environment:
+  #     DATA_SOURCE_NAME: "postgresql://postgres:postgres@postgrestest:5432/postgres_db?sslmode=disable"
+  #   volumes:
+  #     - ./postgres_exporter.yml:/etc/postgres_exporter/postgres_exporter.yml    
+  #     - ./queries.yaml:/etc/postgres_exporter/queries.yaml    
+  #   command:
+  #     - '--config.file=/etc/postgres_exporter/postgres_exporter.yml'    
+  #     # - "--extend.query-path=/etc/postgres_exporter/queries.yaml"    
+  #   ports:
+  #     - "35004:9187"
+  #   depends_on:
+  #     - postgrestest
+  #   networks:
+  #     - jupyterhubtest
+
+  prometheus:
+    image: prom/prometheus:latest #v3.1.0
+    container_name: prometheustest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-datatest:/prometheus
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      # - '--storage.tsdb.path=/prometheus'
+    ports:
+      - "35005:9090"
+    networks:
+      - jupyterhubtest
+    
+  grafana:
+    image: grafana/grafana-enterprise:latest #11.5.1
+    container_name: grafanatest
+    ports:
+      - "35006:3000"
+    networks:
+      - jupyterhubtest
+    volumes:
+      - grafana-datatest:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      # - GF_AUTH_ANONYMOUS_ENABLED=true
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest #v0.49.2
+    container_name: cadvisortest
+    ports:
+      - "35008:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - jupyterhubtest
+    restart: unless-stopped
+  
+  node-exporter:
+    image: prom/node-exporter:v1.5.0 #latest #v1.8.2
+    container_name: node-exportertest
+    ports:
+      - "35009:9100"
+       # pid: "host"
+    networks:
+      - jupyterhubtest
+    volumes:
+      # - /proc:/host/proc:ro
+      # - /sys:/host/sys:ro
+      # -  ./metrics:/app/metrics:rw
+      - /var/lib/node_exporter:/app/metrics:ro
+      # - /:/host:ro
+    command:
+      # - '--path.procfs=/host/proc'
+      # - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+      # - '--collector.textfile.directory=/var/lib/node_exporter'
+      - '--collector.textfile.directory=/app/metrics'
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    container_name: alertmanagertest
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - "35007:9093"
+    networks:
+      - jupyterhubtest
+
+volumes:
+  postgres-datatest:
+  jupyterhub-datatest:
+  grafana-datatest:
+  prometheus-datatest:
+
+networks:
+  jupyterhubtest:
+    name: jupyterhubtest
+
+
+
+
+
+

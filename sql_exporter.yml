@@ -1,0 +1,50 @@
+# sql_exporter.yml
+
+global:
+  scrape_timeout: 10s
+  scrape_timeout_offset: 500ms
+  min_interval: 0s
+  max_connections: 3
+  max_idle_connections: 3
+
+target:
+  # name: postgres_database
+  data_source_name: 'postgres://postgres:postgres@postgrestest:5432/postgres_db?sslmode=disable'
+  collectors: [postgres_standard]
+  # enable_ping: true
+
+collectors:
+  - collector_name: postgres_standard
+
+    metrics:
+      - metric_name: table_size_bytes
+        type: gauge
+        help: 'Size of tables in the database'
+        key_labels:
+          - schema
+          - table
+          - owner
+        values: [size_bytes]
+        query: |
+          SELECT
+            schemaname AS schema,
+            relname AS table,
+            pg_total_relation_size(relid) AS size_bytes,
+            tableowner AS owner
+          FROM
+            pg_catalog.pg_tables
+          JOIN
+            pg_class ON pg_tables.tablename = pg_class.relname
+          WHERE
+            schemaname NOT IN ('pg_catalog', 'information_schema')
+
+      - metric_name: active_connections
+        type: gauge
+        help: 'Number of active connections'
+        values: [active_connections]
+        query: |
+          SELECT COUNT(*) AS active_connections
+          FROM pg_stat_activity
+
+collector_files: 
+  - "*.collector.yml"

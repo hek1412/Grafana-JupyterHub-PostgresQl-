@@ -1,0 +1,36 @@
+global:
+  scrape_interval: '15s'
+  evaluation_interval: '15s'
+    
+scrape_configs:
+  - job_name: 'jupyterhubtest'
+    static_configs:
+      - targets: ['jupyterhubtest:8000']
+
+  # - job_name: 'sql_exporter'
+  #   static_configs:
+  #     - targets: ['sql_exporter:9399']
+  
+  # - job_name: 'postgres_exportertest'
+  #   static_configs:
+  #     - targets: ['postgres_exportertest:9187']
+    
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exportertest:9100']
+ 
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisortest:8080']
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanagertest:9093']
+        
+rule_files:
+  - '/etc/prometheus/alert.rules.yml'
+
+  # - job_name: 'prometheustest'
+  #   static_configs:
+  #     - targets: ['prometheustest:9090'] 
