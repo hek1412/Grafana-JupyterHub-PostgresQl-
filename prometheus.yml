@@ -6,15 +6,7 @@ scrape_configs:
   - job_name: 'jupyterhubtest'
     static_configs:
       - targets: ['jupyterhubtest:8000']
-
-  # - job_name: 'sql_exporter'
-  #   static_configs:
-  #     - targets: ['sql_exporter:9399']
-  
-  # - job_name: 'postgres_exportertest'
-  #   static_configs:
-  #     - targets: ['postgres_exportertest:9187']
-    
+   
   - job_name: 'node-exporter'
     static_configs:
       - targets: ['node-exportertest:9100']
@@ -30,7 +22,3 @@ alerting:
         
 rule_files:
   - '/etc/prometheus/alert.rules.yml'
-
-  # - job_name: 'prometheustest'
-  #   static_configs:
-  #     - targets: ['prometheustest:9090'] 
