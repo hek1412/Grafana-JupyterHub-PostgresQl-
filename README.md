@@ -14,8 +14,17 @@ Grafana/
 │
 ├── grafana/ Каталог для Grafana
 │
-├── alertmanager/Каталог с конфигурацией Alertmanager.
+├── alertmanager/ Каталог с конфигурацией Alertmanager.
 │   └── alertmanager.yml
 │
-└── script/ Каталог для скриптов
+├── script/ Каталог для скриптов
+│   ├── prometheus.yml
+│   ├── prometheus.yml
+│   └── alert.rules.yml
+│
+├── metrics/ Каталог с метрики.
+│   ├── container_sizes.prom
+│   ├── pg_metrics.prom
+│   └── image_sizes.prom
+│ 
 ```
