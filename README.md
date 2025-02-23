@@ -273,7 +273,7 @@ http://skayfaks.keenetic.pro:35100/d/aedxfkzowsyyoa/svedenija-o-razmerah-kontejn
 
 Используем написанный скрипт
 `script/sum_container_sizes.sh`
-[Ссылка на README в script](../script/README.md)
+[Ссылка на README в script](script/README.md)
 
 с его помощью получаем полные размеры всех контейнеров и не только юпитера 
 ![image](https://github.com/user-attachments/assets/03ed3408-d57f-48a5-b822-cd58b1f19106)
