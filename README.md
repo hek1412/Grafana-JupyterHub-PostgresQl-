@@ -359,8 +359,8 @@ http://skayfaks.keenetic.pro:35101/alerts
 Добавляем эти строчки в `crontab -e` и направляем вывод логов в отдельный файл для чтения логов и понимания почему метрики не обновляются)
 
 ```
-*/5 * * * * /home/vitaliyaleks/test1/script/move_metrics.sh >> /home/vitaliyaleks/cron.log 2>&1
-*/10 * * * * /home/vitaliyaleks/test1/script/ssh_monitor.sh >> /home/vitaliyaleks/cron.log 2>&1
+*/6 * * * * /home/vitaliyaleks/test1/script/move_metrics.sh >> /home/vitaliyaleks/cron.log 2>&1
+*/5 * * * * /home/vitaliyaleks/test1/script/ssh_monitor.sh >> /home/vitaliyaleks/cron.log 2>&1
 */15 * * * * /home/vitaliyaleks/test1/script/sum_container_sizes.sh >> /home/vitaliyaleks/cron.log 2>&1
 ```
 
