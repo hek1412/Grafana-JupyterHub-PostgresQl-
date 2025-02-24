@@ -199,19 +199,6 @@ docker compose up --build -d
 ```
 ![image](https://github.com/user-attachments/assets/9989da70-518a-4dc4-9bb8-eb60a8e05ad1)
 
-Нам нужно получить IP контейнера prometheustest
-```
-docker inspect prometheustest
-```
-Или вывод сразу IP
-```
-docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' prometheustest
-```
-
-Результат:
-```
-172.20.0.19
-```
 
 ### Настройка источника данных в Grafana
 
@@ -221,11 +208,12 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' pro
 http://skayfaks.keenetic.pro:35006/
 ```
 
-Выберите источник данных Prometheus, используя полученный IP-адрес (`172.20.0.19`) и порт `9090`.
+Выберите источник данных Prometheus, используя полученный IP-адрес `http://prometheustest` и порт `9090`.
 
 ![image](https://github.com/user-attachments/assets/a593b693-cbda-4760-b8ce-c70e438a2acc)
 
-![image](https://github.com/user-attachments/assets/66bd3d3b-8afd-4d75-af21-7f4161e17811)
+![image](https://github.com/user-attachments/assets/416d26eb-b066-449b-b8d0-6bf34a988b59)
+
 
 ---
 
