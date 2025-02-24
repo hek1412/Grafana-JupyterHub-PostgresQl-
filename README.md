@@ -205,7 +205,7 @@ docker compose up --build -d
 Перейдите в веб-интерфейс Grafana:
 
 ```
-http://skayfaks.keenetic.pro:35006/
+http://skayfaks.keenetic.pro:35100/
 ```
 
 Выберите источник данных Prometheus, используя полученный IP-адрес `http://prometheustest` и порт `9090`.
